@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بازی | ABT-CHESS</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="game-page">
+
+<!-- مودال کپچا -->
+<div class="modal-overlay hidden" id="captchaModal">
+  <div class="modal">
+    <h2>🛡️ تأیید انسان بودن</h2>
+    <p>برای ادامه، به این سؤال پاسخ بده (۱۵ ثانیه فرصت):</p>
+    <div class="captcha-question" id="captchaQuestion">...</div>
+    <div class="timer-bar"><div id="timerFill"></div></div>
+    <input type="text" id="captchaInput" placeholder="پاسخ" inputmode="numeric" autocomplete="off">
+    <button id="captchaSubmit" class="btn-primary">تأیید</button>
+    <p class="error" id="captchaError"></p>
+  </div>
+</div>
+
+<!-- مودال جستجو -->
+<div class="modal-overlay" id="searchModal">
+  <div class="modal">
+    <div class="spinner"></div>
+    <h2 id="searchTitle">در حال جستجوی حریف...</h2>
+    <p id="searchMessage">لطفاً صبر کن</p>
+    <button id="cancelSearch" class="btn-ghost">لغو</button>
+  </div>
+</div>
+
+<!-- مودال انتظار برای حریف -->
+<div class="modal-overlay hidden" id="waitingOpponentModal">
+  <div class="modal">
+    <div class="spinner"></div>
+    <h2>✅ تأیید شد</h2>
+    <p>در انتظار تأیید حریف...</p>
+  </div>
+</div>
+
+<div class="game-wrapper" id="gameArea" style="display:none;">
+  <div class="game-info">
+
+    <div class="game-toolbar">
+  <button id="settingsBtn" class="btn-tool" title="تنظیمات ظاهری">
+    <span>⚙️</span>
+    <span>تنظیمات</span>
+  </button>
+</div>
+
+    <div class="player">
+      <span class="dot white"></span>
+      <span id="whiteName">سفید</span>
+    </div>
+    <div class="vs">VS</div>
+    <div class="player">
+      <span class="dot black"></span>
+      <span id="blackName">سیاه</span>
+    </div>
+  </div>
+
+  <div id="board" class="board"></div>
+
+  <div class="game-status" id="status">در حال آماده‌سازی...</div>
+
+  <div class="game-actions">
+    <button id="resignBtn" class="btn-ghost">تسلیم</button>
+    <button id="leaveBtn" class="btn-ghost">ترک بازی</button>
+  </div>
+</div>
+
+
+<!-- ============ مودال تنظیمات ============ -->
+<div class="modal-overlay hidden" id="settingsModal">
+  <div class="modal modal-settings">
+    <button class="modal-close" id="closeSettings">✕</button>
+    <h2>🎨 شخصی‌سازی ظاهر</h2>
+    <p>سلیقه‌ات رو اعمال کن — تنظیمات خودکار ذخیره میشه</p>
+
+    <!-- انتخاب تم تخته -->
+    <div class="setting-section">
+      <label class="setting-label">🎯 تم تخته شطرنج</label>
+      <div class="theme-grid" id="boardThemeGrid">
+        <!-- با JS پر میشه -->
+      </div>
+    </div>
+
+    <!-- انتخاب تم مهره‌ها -->
+    <div class="setting-section">
+      <label class="setting-label">♟️ تم مهره‌ها</label>
+      <div class="theme-grid" id="pieceThemeGrid">
+        <!-- با JS پر میشه -->
+      </div>
+    </div>
+
+    <!-- اندازه تخته -->
+    <div class="setting-section">
+      <label class="setting-label">📐 اندازه تخته</label>
+      <input type="range" id="boardSize" min="70" max="100" value="100" class="range-input">
+      <div class="range-labels">
+        <span>کوچک</span>
+        <span id="boardSizeValue">100%</span>
+        <span>بزرگ</span>
+      </div>
+    </div>
+
+    <!-- افکت‌های بصری -->
+    <div class="setting-section">
+      <label class="setting-label">✨ افکت‌های بصری</label>
+      <div class="toggle-group">
+        <label class="toggle">
+          <input type="checkbox" id="showHints" checked>
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">نمایش حرکات مجاز</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="showCoords" checked>
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">نمایش مختصات</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="animations" checked>
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">انیمیشن‌ها</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-ghost" id="resetSettings">🔄 بازنشانی</button>
+      <button class="btn-primary" id="saveSettings">✅ ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ مودال پایان بازی ============ -->
+<div class="modal-overlay hidden" id="gameOverModal">
+  <div class="modal modal-gameover">
+    <div class="result-icon" id="resultIcon">🏆</div>
+    <h2 class="result-title" id="resultTitle">شما برنده شدید!</h2>
+    <p class="result-subtitle" id="resultSubtitle">شاه مات در ۲۳ حرکت</p>
+
+    <div class="result-stats">
+      <div class="stat">
+        <div class="stat-value" id="statMoves">0</div>
+        <div class="stat-label">حرکت</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="statTime">0:00</div>
+        <div class="stat-label">زمان</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="statCaptures">0</div>
+        <div class="stat-label">مهره گرفته</div>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn-primary" id="playAgainBtn">
+        <span>🎮</span>
+        <span>بازی جدید</span>
+      </button>
+      <button class="btn-ghost" id="backHomeBtn">بازگشت به خانه</button>
+    </div>
+  </div>
+</div>
+
+<!-- کانفتی (افکت جشن) -->
+<div class="confetti" id="confetti"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+
+<!-- ⚠️ این دو خط ترتیبشون مهمه -->
+<script src="/js/settings.js"></script>   <!-- اول -->
+<script src="/js/game.js"></script>       <!-- بعد -->
+</body>
+</html>

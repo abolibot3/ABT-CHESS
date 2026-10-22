@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ورود | ABT-CHESS</title>
+<link rel="stylesheet" href="/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="login-page">
+
+<div class="board-bg"></div>
+
+<div class="login-card">
+  <div class="logo">
+    <span class="piece">♞</span>
+    <h1>ABT<span>CHESS</span></h1>
+  </div>
+
+  <p class="tagline">به دنیای شطرنج آنلاین خوش آمدی</p>
+
+  <form id="loginForm">
+    <div class="input-group">
+      <input type="text" id="username" placeholder="نام کاربری" maxlength="20" required>
+    </div>
+
+    <div class="mode-tabs">
+      <button type="button" class="tab active" data-mode="random">🎲 حریف تصادفی</button>
+      <button type="button" class="tab" data-mode="code">🔑 با کد اتاق</button>
+    </div>
+
+    <div class="input-group hidden" id="codeGroup">
+      <input type="text" id="roomCode" placeholder="کد اتاق (مثلا 1234)" inputmode="numeric" maxlength="8">
+    </div>
+
+    <button type="submit" class="btn-primary">
+      <span>ورود به بازی</span>
+      <span class="arrow">→</span>
+    </button>
+  </form>
+
+  <p class="error" id="error"></p>
+</div>
+
+<script src="/js/login.js"></script>
+</body>
+</html>
